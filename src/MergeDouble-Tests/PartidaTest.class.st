@@ -71,6 +71,15 @@ PartidaTest >> testFusionSumaALaRacha [
 ]
 
 { #category : 'tests' }
+PartidaTest >> testFusionarUnGrupoConFichaConBonusOtorgaUnaCarga [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	(partida tablero fichaEn: 2 @ 1) marcarConBonus.
+	partida seleccionar: 1 @ 1.
+	self assert: partida cargasDeBonus equals: 1
+]
+
+{ #category : 'tests' }
 PartidaTest >> testPartidaNuevaEmpiezaConTresVidas [
 
 	self assert: Partida estandar vidas equals: 3

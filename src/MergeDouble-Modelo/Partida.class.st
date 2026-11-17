@@ -164,11 +164,13 @@ Partida >> reiniciar [
 { #category : 'operations' }
 Partida >> seleccionar: pos [
 
-	| absorbidas |
+	| absorbidas bonusGanados |
 	(tablero puedeFusionar: pos) ifFalse: [ ^ false ].
+	bonusGanados := tablero bonusEnGrupoDesde: pos.
 	absorbidas := tablero fusionar: pos.
 	racha registrar: (tablero fichaEn: pos) valor.
 	self otorgarBonusSiCorresponde.
+	cargasDeBonus := cargasDeBonus + bonusGanados.
 	puntaje := puntaje + (self puntosPorAbsorber: absorbidas).
 	tablero aplicarGravedad.
 	tablero rellenar.
