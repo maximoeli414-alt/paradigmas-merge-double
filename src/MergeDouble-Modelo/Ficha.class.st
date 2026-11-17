@@ -7,6 +7,7 @@ Class {
 	#instVars : [
 		'valor'
 	],
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
 
@@ -16,16 +17,10 @@ Ficha class >> valor: unValor [
 	^ self new setValor: unValor
 ]
 
-{ #category : 'initialization' }
-Ficha >> setValor: unValor [
+{ #category : 'operations' }
+Ficha >> duplicar [
 
-	valor := unValor
-]
-
-{ #category : 'accessing' }
-Ficha >> valor [
-
-	^ valor
+	valor := valor * 2
 ]
 
 { #category : 'testing' }
@@ -40,14 +35,20 @@ Ficha >> esCompatibleCon: otraFicha [
 	^ self subclassResponsibility
 ]
 
-{ #category : 'operations' }
-Ficha >> duplicar [
-
-	valor := valor * 2
-]
-
 { #category : 'printing' }
 Ficha >> printOn: aStream [
 
 	aStream print: valor
+]
+
+{ #category : 'initialization' }
+Ficha >> setValor: unValor [
+
+	valor := unValor
+]
+
+{ #category : 'accessing' }
+Ficha >> valor [
+
+	^ valor
 ]

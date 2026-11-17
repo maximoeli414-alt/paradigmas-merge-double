@@ -9,6 +9,7 @@ Class {
 		'probabilidadComodin',
 		'azar'
 	],
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
 
