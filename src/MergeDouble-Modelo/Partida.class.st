@@ -8,16 +8,12 @@ Class {
 		'tablero',
 		'puntaje',
 		'mejorPuntaje',
-		'metaValor'
+		'metaValor',
+		'vidas'
 	],
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
-
-{ #category : 'instance creation' }
-Partida class >> filas: f columnas: c meta: unValor [
-
-	^ self new initializeFilas: f columnas: c meta: unValor
-]
 
 { #category : 'instance creation' }
 Partida class >> estandar [
@@ -25,32 +21,39 @@ Partida class >> estandar [
 	^ self filas: 9 columnas: 11 meta: 2048
 ]
 
-{ #category : 'initialization' }
-Partida >> initializeFilas: f columnas: c meta: unValor [
+{ #category : 'instance creation' }
+Partida class >> filas: f columnas: c meta: unValor [
 
-	tablero := Tablero filas: f columnas: c.
-	metaValor := unValor.
-	puntaje := 0.
-	mejorPuntaje := 0.
-	self reiniciar
+	| partida |
+	partida := self tablero: (Tablero filas: f columnas: c) meta: unValor.
+	partida reiniciar.
+	^ partida
 ]
 
-{ #category : 'accessing' }
-Partida >> tablero [
+{ #category : 'constants' }
+Partida class >> maximoMezclas [
+	"Tope de mezclas seguidas antes de regenerar el tablero, para evitar un bucle infinito."
 
-	^ tablero
+	^ 50
 ]
 
-{ #category : 'accessing' }
-Partida >> puntaje [
+{ #category : 'instance creation' }
+Partida class >> tablero: unTablero meta: unValor [
 
-	^ puntaje
+	^ self tablero: unTablero meta: unValor vidas: self vidasIniciales
 ]
 
-{ #category : 'accessing' }
-Partida >> mejorPuntaje [
+{ #category : 'instance creation' }
+Partida class >> tablero: unTablero meta: unValor vidas: cantidadDeVidas [
+	"Crea una partida sobre un tablero ya armado, sin reiniciarlo. Util para pruebas."
 
-	^ mejorPuntaje
+	^ self new initializeTablero: unTablero meta: unValor vidas: cantidadDeVidas
+]
+
+{ #category : 'constants' }
+Partida class >> vidasIniciales [
+
+	^ 3
 ]
 
 { #category : 'testing' }
@@ -62,7 +65,67 @@ Partida >> estaGanada [
 { #category : 'testing' }
 Partida >> estaPerdida [
 
-	^ self estaGanada not and: [ tablero hayMovimientosPosibles not ]
+	^ self estaGanada not and: [ vidas <= 0 ]
+]
+
+{ #category : 'initialization' }
+Partida >> initializeTablero: unTablero meta: unValor vidas: cantidadDeVidas [
+
+	tablero := unTablero.
+	metaValor := unValor.
+	vidas := cantidadDeVidas.
+	puntaje := 0.
+	mejorPuntaje := 0
+]
+
+{ #category : 'accessing' }
+Partida >> mejorPuntaje [
+
+	^ mejorPuntaje
+]
+
+{ #category : 'private' }
+Partida >> mezclarHastaHaberMovimientos [
+	"Mezcla hasta que el tablero tenga al menos un movimiento. No cuesta vidas.
+	Si tras muchas mezclas sigue bloqueado, regenera el tablero entero."
+
+	| intentos |
+	intentos := 0.
+	[ tablero hayMovimientosPosibles ] whileFalse: [
+		intentos := intentos + 1.
+		intentos > self class maximoMezclas
+			ifTrue: [ tablero reiniciar. intentos := 0 ]
+			ifFalse: [ tablero mezclar ] ]
+]
+
+{ #category : 'operations' }
+Partida >> perderVida [
+	"Resta una sola vida. Si quedan, mezcla el tablero hasta que haya movimientos."
+
+	vidas := vidas - 1.
+	vidas > 0 ifTrue: [ self mezclarHastaHaberMovimientos ]
+]
+
+{ #category : 'accessing' }
+Partida >> puntaje [
+
+	^ puntaje
+]
+
+{ #category : 'private' }
+Partida >> puntosPorAbsorber: cantidad [
+
+	^ cantidad * 10
+]
+
+{ #category : 'operations' }
+Partida >> reiniciar [
+
+	mejorPuntaje := mejorPuntaje max: puntaje.
+	puntaje := 0.
+	vidas := self class vidasIniciales.
+	tablero reiniciar.
+	self mezclarHastaHaberMovimientos
 ]
 
 { #category : 'operations' }
@@ -75,19 +138,27 @@ Partida >> seleccionar: pos [
 	tablero aplicarGravedad.
 	tablero rellenar.
 	mejorPuntaje := mejorPuntaje max: puntaje.
+	self verificarBloqueo.
 	^ true
 ]
 
-{ #category : 'operations' }
-Partida >> reiniciar [
+{ #category : 'accessing' }
+Partida >> tablero [
 
-	mejorPuntaje := mejorPuntaje max: puntaje.
-	puntaje := 0.
-	tablero reiniciar
+	^ tablero
 ]
 
-{ #category : 'private' }
-Partida >> puntosPorAbsorber: cantidad [
+{ #category : 'operations' }
+Partida >> verificarBloqueo [
+	"Si el tablero quedo sin movimientos y la partida sigue en juego, cuesta una vida."
 
-	^ cantidad * 10
+	self estaGanada ifTrue: [ ^ self ].
+	tablero hayMovimientosPosibles ifTrue: [ ^ self ].
+	self perderVida
+]
+
+{ #category : 'accessing' }
+Partida >> vidas [
+
+	^ vidas
 ]

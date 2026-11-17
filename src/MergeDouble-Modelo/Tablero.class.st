@@ -8,6 +8,7 @@ Class {
 		'celdas',
 		'generador'
 	],
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
 
@@ -29,17 +30,24 @@ Tablero class >> tamanioMinimoGrupo [
 	^ 3
 ]
 
-{ #category : 'initialization' }
-Tablero >> initializeFilas: unasFilas columnas: unasColumnas generador: unGenerador [
+{ #category : 'operations' }
+Tablero >> aplicarGravedad [
 
-	celdas := (1 to: unasFilas) collect: [ :i | Array new: unasColumnas ].
-	generador := unGenerador
+	1 to: self columnas do: [ :c | self aplicarGravedadEnColumna: c ]
 ]
 
-{ #category : 'accessing' }
-Tablero >> filas [
+{ #category : 'private' }
+Tablero >> aplicarGravedadEnColumna: c [
 
-	^ celdas size
+	| fichas huecos |
+	fichas := ((1 to: self filas) collect: [ :f | self fichaEnFila: f columna: c ])
+		reject: [ :ficha | ficha isNil ].
+	huecos := self filas - fichas size.
+	1 to: self filas do: [ :f |
+		self
+			ponerFicha: (f <= huecos ifTrue: [ nil ] ifFalse: [ fichas at: f - huecos ])
+			enFila: f
+			columna: c ]
 ]
 
 { #category : 'accessing' }
@@ -48,16 +56,28 @@ Tablero >> columnas [
 	^ celdas first size
 ]
 
-{ #category : 'accessing' }
-Tablero >> fichaEnFila: f columna: c [
+{ #category : 'testing' }
+Tablero >> contieneFichaDeValorAlMenos: unValor [
 
-	^ (celdas at: f) at: c
+	^ self fichas anySatisfy: [ :ficha | ficha valor >= unValor ]
+]
+
+{ #category : 'testing' }
+Tablero >> esPosicionValidaFila: f columna: c [
+
+	^ (f between: 1 and: self filas) and: [ c between: 1 and: self columnas ]
 ]
 
 { #category : 'accessing' }
 Tablero >> fichaEn: pos [
 
 	^ self fichaEnFila: pos y columna: pos x
+]
+
+{ #category : 'accessing' }
+Tablero >> fichaEnFila: f columna: c [
+
+	^ (celdas at: f) at: c
 ]
 
 { #category : 'accessing' }
@@ -70,47 +90,22 @@ Tablero >> fichas [
 	^ resultado
 ]
 
+{ #category : 'accessing' }
+Tablero >> filas [
+
+	^ celdas size
+]
+
 { #category : 'operations' }
-Tablero >> ponerFicha: unaFicha enFila: f columna: c [
+Tablero >> fusionar: pos [
 
-	(celdas at: f) at: c put: unaFicha
-]
-
-{ #category : 'testing' }
-Tablero >> esPosicionValidaFila: f columna: c [
-
-	^ (f between: 1 and: self filas) and: [ c between: 1 and: self columnas ]
-]
-
-{ #category : 'testing' }
-Tablero >> puedeFusionar: pos [
-
-	| ficha |
-	ficha := self fichaEn: pos.
-	(ficha isNil or: [ ficha esComodin ]) ifTrue: [ ^ false ].
-	^ (self grupoConectadoDesde: pos) size >= self class tamanioMinimoGrupo
-]
-
-{ #category : 'testing' }
-Tablero >> hayMovimientosPosibles [
-
-	1 to: self filas do: [ :f |
-		1 to: self columnas do: [ :c |
-			(self puedeFusionar: c @ f) ifTrue: [ ^ true ] ] ].
-	^ false
-]
-
-{ #category : 'testing' }
-Tablero >> contieneFichaDeValorAlMenos: unValor [
-
-	^ self fichas anySatisfy: [ :ficha | ficha valor >= unValor ]
-]
-
-{ #category : 'queries' }
-Tablero >> vecinosDe: pos [
-
-	^ { pos + (-1 @ 0). pos + (1 @ 0). pos + (0 @ -1). pos + (0 @ 1) }
-		select: [ :p | self esPosicionValidaFila: p y columna: p x ]
+	| grupo |
+	(self puedeFusionar: pos)
+		ifFalse: [ ^ self error: 'No hay un grupo fusionable en esa posicion' ].
+	grupo := self grupoConectadoDesde: pos.
+	(self fichaEn: pos) duplicar.
+	(grupo reject: [ :p | p = pos ]) do: [ :p | self vaciar: p ].
+	^ grupo size - 1
 ]
 
 { #category : 'queries' }
@@ -133,22 +128,57 @@ Tablero >> grupoConectadoDesde: pos [
 	^ grupo asOrderedCollection
 ]
 
-{ #category : 'operations' }
-Tablero >> fusionar: pos [
+{ #category : 'testing' }
+Tablero >> hayMovimientosPosibles [
 
-	| grupo |
-	(self puedeFusionar: pos)
-		ifFalse: [ ^ self error: 'No hay un grupo fusionable en esa posicion' ].
-	grupo := self grupoConectadoDesde: pos.
-	(self fichaEn: pos) duplicar.
-	(grupo reject: [ :p | p = pos ]) do: [ :p | self vaciar: p ].
-	^ grupo size - 1
+	1 to: self filas do: [ :f |
+		1 to: self columnas do: [ :c |
+			(self puedeFusionar: c @ f) ifTrue: [ ^ true ] ] ].
+	^ false
+]
+
+{ #category : 'initialization' }
+Tablero >> initializeFilas: unasFilas columnas: unasColumnas generador: unGenerador [
+
+	celdas := (1 to: unasFilas) collect: [ :i | Array new: unasColumnas ].
+	generador := unGenerador
 ]
 
 { #category : 'operations' }
-Tablero >> aplicarGravedad [
+Tablero >> mezclar [
+	"Redistribuye al azar las fichas que ya estan en el tablero. Las celdas vacias siguen vacias."
 
-	1 to: self columnas do: [ :c | self aplicarGravedadEnColumna: c ]
+	| posiciones barajadas |
+	posiciones := OrderedCollection new.
+	1 to: self filas do: [ :f |
+		1 to: self columnas do: [ :c |
+			(self fichaEnFila: f columna: c) ifNotNil: [ posiciones add: c @ f ] ] ].
+	barajadas := self fichas shuffled.
+	posiciones with: barajadas do: [ :pos :ficha |
+		self ponerFicha: ficha enFila: pos y columna: pos x ]
+]
+
+{ #category : 'operations' }
+Tablero >> ponerFicha: unaFicha enFila: f columna: c [
+
+	(celdas at: f) at: c put: unaFicha
+]
+
+{ #category : 'testing' }
+Tablero >> puedeFusionar: pos [
+
+	| ficha |
+	ficha := self fichaEn: pos.
+	(ficha isNil or: [ ficha esComodin ]) ifTrue: [ ^ false ].
+	^ (self grupoConectadoDesde: pos) size >= self class tamanioMinimoGrupo
+]
+
+{ #category : 'operations' }
+Tablero >> reiniciar [
+
+	1 to: self filas do: [ :f |
+		1 to: self columnas do: [ :c | self vaciar: c @ f ] ].
+	self rellenar
 ]
 
 { #category : 'operations' }
@@ -160,30 +190,15 @@ Tablero >> rellenar [
 				self ponerFicha: generador nuevaFicha enFila: i columna: j ] ] ]
 ]
 
-{ #category : 'operations' }
-Tablero >> reiniciar [
-
-	1 to: self filas do: [ :f |
-		1 to: self columnas do: [ :c | self vaciar: c @ f ] ].
-	self rellenar
-]
-
 { #category : 'private' }
 Tablero >> vaciar: pos [
 
 	self ponerFicha: nil enFila: pos y columna: pos x
 ]
 
-{ #category : 'private' }
-Tablero >> aplicarGravedadEnColumna: c [
+{ #category : 'queries' }
+Tablero >> vecinosDe: pos [
 
-	| fichas huecos |
-	fichas := ((1 to: self filas) collect: [ :f | self fichaEnFila: f columna: c ])
-		reject: [ :ficha | ficha isNil ].
-	huecos := self filas - fichas size.
-	1 to: self filas do: [ :f |
-		self
-			ponerFicha: (f <= huecos ifTrue: [ nil ] ifFalse: [ fichas at: f - huecos ])
-			enFila: f
-			columna: c ]
+	^ { pos + (-1 @ 0). pos + (1 @ 0). pos + (0 @ -1). pos + (0 @ 1) }
+		select: [ :p | self esPosicionValidaFila: p y columna: p x ]
 ]

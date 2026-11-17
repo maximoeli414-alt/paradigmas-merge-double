@@ -4,6 +4,7 @@ Ficha especial compatible con cualquier otra. Tiene valor 0 y no puede ser la fi
 Class {
 	#name : 'FichaComodin',
 	#superclass : 'Ficha',
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
 

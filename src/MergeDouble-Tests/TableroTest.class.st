@@ -7,6 +7,7 @@ Class {
 	#instVars : [
 		'tablero'
 	],
+	#category : 'MergeDouble-Tests',
 	#package : 'MergeDouble-Tests'
 }
 
@@ -20,17 +21,25 @@ TableroTest >> cargar: matriz [
 ]
 
 { #category : 'tests' }
-TableroTest >> testGrupoDeTresPuedeFusionarse [
+TableroTest >> testComodinNoPuedeSerLaFichaSeleccionada [
 
 	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
-	self assert: (tablero grupoConectadoDesde: 1 @ 1) size equals: 3.
+	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 2.
+	self deny: (tablero puedeFusionar: 2 @ 1)
+]
+
+{ #category : 'tests' }
+TableroTest >> testComodinSeUneAlGrupo [
+
+	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
+	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 2.
 	self assert: (tablero puedeFusionar: 1 @ 1)
 ]
 
 { #category : 'tests' }
-TableroTest >> testParNoPuedeFusionarse [
+TableroTest >> testDiagonalNoCuentaComoAdyacente [
 
-	self cargar: { {4. 4. 2}. {2. 8. 16}. {16. 2. 8} }.
+	self cargar: { {4. 2. 8}. {2. 4. 16}. {8. 16. 4} }.
 	self deny: (tablero puedeFusionar: 1 @ 1)
 ]
 
@@ -39,13 +48,6 @@ TableroTest >> testFichaAisladaNoPuedeFusionarse [
 
 	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
 	self deny: (tablero puedeFusionar: 2 @ 2)
-]
-
-{ #category : 'tests' }
-TableroTest >> testDiagonalNoCuentaComoAdyacente [
-
-	self cargar: { {4. 2. 8}. {2. 4. 16}. {8. 16. 4} }.
-	self deny: (tablero puedeFusionar: 1 @ 1)
 ]
 
 { #category : 'tests' }
@@ -77,19 +79,38 @@ TableroTest >> testGravedadHaceCaerLasFichas [
 ]
 
 { #category : 'tests' }
-TableroTest >> testComodinSeUneAlGrupo [
+TableroTest >> testGrupoDeTresPuedeFusionarse [
 
 	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
-	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 2.
+	self assert: (tablero grupoConectadoDesde: 1 @ 1) size equals: 3.
 	self assert: (tablero puedeFusionar: 1 @ 1)
 ]
 
 { #category : 'tests' }
-TableroTest >> testComodinNoPuedeSerLaFichaSeleccionada [
+TableroTest >> testMezclarConservaLaCantidadDeFichas [
 
-	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
-	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 2.
-	self deny: (tablero puedeFusionar: 2 @ 1)
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	tablero mezclar.
+	self assert: tablero fichas size equals: 9
+]
+
+{ #category : 'tests' }
+TableroTest >> testMezclarConservaLosValores [
+
+	| antes |
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	antes := (tablero fichas collect: [ :f | f valor ]) asSortedCollection asArray.
+	tablero mezclar.
+	self
+		assert: ((tablero fichas collect: [ :f | f valor ]) asSortedCollection asArray)
+		equals: antes
+]
+
+{ #category : 'tests' }
+TableroTest >> testParNoPuedeFusionarse [
+
+	self cargar: { {4. 4. 2}. {2. 8. 16}. {16. 2. 8} }.
+	self deny: (tablero puedeFusionar: 1 @ 1)
 ]
 
 { #category : 'tests' }
