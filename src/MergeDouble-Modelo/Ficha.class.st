@@ -5,7 +5,8 @@ Class {
 	#name : 'Ficha',
 	#superclass : 'Object',
 	#instVars : [
-		'valor'
+		'valor',
+		'conBonus'
 	],
 	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
@@ -35,16 +36,42 @@ Ficha >> esCompatibleCon: otraFicha [
 	^ self subclassResponsibility
 ]
 
+{ #category : 'initialization' }
+Ficha >> initialize [
+
+	super initialize.
+	conBonus := false
+]
+
+{ #category : 'operations' }
+Ficha >> marcarConBonus [
+
+	conBonus := true
+]
+
 { #category : 'printing' }
 Ficha >> printOn: aStream [
 
-	aStream print: valor
+	aStream print: valor.
+	self tieneBonus ifTrue: [ aStream nextPut: $+ ]
+]
+
+{ #category : 'operations' }
+Ficha >> quitarBonus [
+
+	conBonus := false
 ]
 
 { #category : 'initialization' }
 Ficha >> setValor: unValor [
 
 	valor := unValor
+]
+
+{ #category : 'testing' }
+Ficha >> tieneBonus [
+
+	^ conBonus
 ]
 
 { #category : 'accessing' }

@@ -21,6 +21,14 @@ TableroTest >> cargar: matriz [
 ]
 
 { #category : 'tests' }
+TableroTest >> testBonusEnGrupoCuentaLasFichasMarcadas [
+
+	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
+	(tablero fichaEn: 2 @ 1) marcarConBonus.
+	self assert: (tablero bonusEnGrupoDesde: 1 @ 1) equals: 1
+]
+
+{ #category : 'tests' }
 TableroTest >> testComodinNoPuedeSerLaFichaSeleccionada [
 
 	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
@@ -92,6 +100,15 @@ TableroTest >> testFusionarEnPosicionInvalidaLanzaError [
 
 	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
 	self should: [ tablero fusionar: 2 @ 2 ] raise: Error
+]
+
+{ #category : 'tests' }
+TableroTest >> testFusionarQuitaElBonusDeLaFichaSeleccionada [
+
+	self cargar: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} }.
+	(tablero fichaEn: 1 @ 1) marcarConBonus.
+	tablero fusionar: 1 @ 1.
+	self deny: (tablero fichaEn: 1 @ 1) tieneBonus
 ]
 
 { #category : 'tests' }

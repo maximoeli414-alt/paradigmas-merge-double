@@ -50,6 +50,13 @@ Tablero >> aplicarGravedadEnColumna: c [
 			columna: c ]
 ]
 
+{ #category : 'queries' }
+Tablero >> bonusEnGrupoDesde: pos [
+	"Cantidad de fichas con bonus dentro del grupo que se fusionaria desde pos."
+
+	^ (self grupoConectadoDesde: pos) count: [ :p | (self fichaEn: p) tieneBonus ]
+]
+
 { #category : 'accessing' }
 Tablero >> columnas [
 
@@ -131,6 +138,7 @@ Tablero >> fusionar: pos [
 	(self puedeFusionar: pos)
 		ifFalse: [ ^ self error: 'No hay un grupo fusionable en esa posicion' ].
 	grupo := self grupoConectadoDesde: pos.
+	(self fichaEn: pos) quitarBonus.
 	(self fichaEn: pos) duplicar.
 	(grupo reject: [ :p | p = pos ]) do: [ :p | self vaciar: p ].
 	^ grupo size - 1

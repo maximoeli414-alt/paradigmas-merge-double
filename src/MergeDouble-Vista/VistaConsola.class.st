@@ -28,7 +28,7 @@ VistaConsola >> avisandoCambiosDe: unBloque [
 	partida vidas < vidasAntes ifTrue: [
 		Transcript show: 'Sin movimientos: perdiste una vida y se mezclo el tablero'; cr ].
 	partida cargasDeBonus > cargasAntes ifTrue: [
-		Transcript show: 'Racha completa! Ganaste un bonus. Escribi B para usarlo'; cr ].
+		Transcript show: 'Ganaste un bonus! Escribi B para usarlo'; cr ].
 	^ resultado
 ]
 
