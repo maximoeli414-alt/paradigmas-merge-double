@@ -44,6 +44,14 @@ PartidaTest >> testConMovimientosNoSeRestaVida [
 ]
 
 { #category : 'tests' }
+PartidaTest >> testFusionSumaALaRacha [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	partida seleccionar: 1 @ 1.
+	self assert: partida racha contador equals: 1
+]
+
+{ #category : 'tests' }
 PartidaTest >> testPartidaNuevaEmpiezaConTresVidas [
 
 	self assert: Partida estandar vidas equals: 3
@@ -59,12 +67,30 @@ PartidaTest >> testPerderLaUltimaVidaTerminaLaPartida [
 ]
 
 { #category : 'tests' }
+PartidaTest >> testPerderUnaVidaNoRompeLaRacha [
+
+	partida := self partidaConMatriz: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} } meta: 2048 vidas: 3.
+	partida racha registrar: 4.
+	partida verificarBloqueo.
+	self assert: partida racha contador equals: 1
+]
+
+{ #category : 'tests' }
 PartidaTest >> testReiniciarRestauraLasVidas [
 
 	partida := Partida estandar.
 	partida perderVida.
 	partida reiniciar.
 	self assert: partida vidas equals: 3
+]
+
+{ #category : 'tests' }
+PartidaTest >> testSeleccionInvalidaNoTocaLaRacha [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	partida racha registrar: 4.
+	partida seleccionar: 2 @ 2.
+	self assert: partida racha contador equals: 1
 ]
 
 { #category : 'tests' }

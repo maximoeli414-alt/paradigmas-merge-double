@@ -57,10 +57,12 @@ VistaConsola >> mostrarTablero [
 	| tablero |
 	tablero := partida tablero.
 	Transcript
-		show: ('Puntaje: {1}   Mejor: {2}   Vidas: {3}' format: {
+		show: ('Puntaje: {1}   Mejor: {2}   Vidas: {3}   Racha: {4}/{5}' format: {
 				partida puntaje printString.
 				partida mejorPuntaje printString.
-				partida vidas printString });
+				partida vidas printString.
+				partida racha contador printString.
+				Racha umbral printString });
 		cr.
 	1 to: tablero filas do: [ :f |
 		1 to: tablero columnas do: [ :c |
