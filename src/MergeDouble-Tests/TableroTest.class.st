@@ -44,6 +44,33 @@ TableroTest >> testDiagonalNoCuentaComoAdyacente [
 ]
 
 { #category : 'tests' }
+TableroTest >> testDuplicarFichaEn [
+
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	tablero duplicarFichaEn: 1 @ 1.
+	self assert: (tablero fichaEn: 1 @ 1) valor equals: 8
+]
+
+{ #category : 'tests' }
+TableroTest >> testDuplicarUnComodinLanzaError [
+
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 1.
+	self should: [ tablero duplicarFichaEn: 1 @ 1 ] raise: Error
+]
+
+{ #category : 'tests' }
+TableroTest >> testEliminarValorMinimoQuitaTodasLasFichasDeEseValor [
+
+	| eliminadas |
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	eliminadas := tablero eliminarValorMinimo.
+	self assert: eliminadas equals: 3.
+	self assert: tablero fichas size equals: 6.
+	self assert: tablero valorMinimo equals: 4
+]
+
+{ #category : 'tests' }
 TableroTest >> testFichaAisladaNoPuedeFusionarse [
 
 	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
@@ -87,6 +114,15 @@ TableroTest >> testGrupoDeTresPuedeFusionarse [
 ]
 
 { #category : 'tests' }
+TableroTest >> testIntercambiarFichas [
+
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	tablero intercambiar: 1 @ 1 con: 3 @ 3.
+	self assert: (tablero fichaEn: 1 @ 1) valor equals: 2.
+	self assert: (tablero fichaEn: 3 @ 3) valor equals: 4
+]
+
+{ #category : 'tests' }
 TableroTest >> testMezclarConservaLaCantidadDeFichas [
 
 	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
@@ -114,8 +150,24 @@ TableroTest >> testParNoPuedeFusionarse [
 ]
 
 { #category : 'tests' }
+TableroTest >> testRomperFichaVaciaLaCelda [
+
+	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
+	tablero romperFichaEn: 2 @ 2.
+	self assert: (tablero fichaEn: 2 @ 2) isNil
+]
+
+{ #category : 'tests' }
 TableroTest >> testSinMovimientosPosibles [
 
 	self cargar: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} }.
 	self deny: tablero hayMovimientosPosibles
+]
+
+{ #category : 'tests' }
+TableroTest >> testValorMinimoIgnoraLosComodines [
+
+	self cargar: { {8. 8}. {8. 8} }.
+	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 1.
+	self assert: tablero valorMinimo equals: 8
 ]

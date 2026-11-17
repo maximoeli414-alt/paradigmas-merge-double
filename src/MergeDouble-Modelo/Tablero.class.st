@@ -62,6 +62,34 @@ Tablero >> contieneFichaDeValorAlMenos: unValor [
 	^ self fichas anySatisfy: [ :ficha | ficha valor >= unValor ]
 ]
 
+{ #category : 'operations' }
+Tablero >> duplicarFichaEn: pos [
+
+	| ficha |
+	ficha := self fichaEn: pos.
+	(ficha isNil or: [ ficha esComodin ])
+		ifTrue: [ ^ self error: 'No se puede duplicar esa ficha' ].
+	ficha duplicar
+]
+
+{ #category : 'operations' }
+Tablero >> eliminarValorMinimo [
+	"Elimina todas las fichas comunes de menor valor. Devuelve cuantas elimino."
+
+	| minimo eliminadas |
+	minimo := self valorMinimo.
+	eliminadas := 0.
+	1 to: self filas do: [ :f |
+		1 to: self columnas do: [ :c |
+			| ficha |
+			ficha := self fichaEnFila: f columna: c.
+			(ficha notNil and: [ ficha esComodin not and: [ ficha valor = minimo ] ])
+				ifTrue: [
+					self vaciar: c @ f.
+					eliminadas := eliminadas + 1 ] ] ].
+	^ eliminadas
+]
+
 { #category : 'testing' }
 Tablero >> esPosicionValidaFila: f columna: c [
 
@@ -145,6 +173,16 @@ Tablero >> initializeFilas: unasFilas columnas: unasColumnas generador: unGenera
 ]
 
 { #category : 'operations' }
+Tablero >> intercambiar: pos1 con: pos2 [
+
+	| ficha1 ficha2 |
+	ficha1 := self fichaEn: pos1.
+	ficha2 := self fichaEn: pos2.
+	self ponerFicha: ficha2 enFila: pos1 y columna: pos1 x.
+	self ponerFicha: ficha1 enFila: pos2 y columna: pos2 x
+]
+
+{ #category : 'operations' }
 Tablero >> mezclar [
 	"Redistribuye al azar las fichas que ya estan en el tablero. Las celdas vacias siguen vacias."
 
@@ -190,10 +228,26 @@ Tablero >> rellenar [
 				self ponerFicha: generador nuevaFicha enFila: i columna: j ] ] ]
 ]
 
+{ #category : 'operations' }
+Tablero >> romperFichaEn: pos [
+
+	(self fichaEn: pos) ifNil: [ ^ self error: 'No hay ficha en esa posicion' ].
+	self vaciar: pos
+]
+
 { #category : 'private' }
 Tablero >> vaciar: pos [
 
 	self ponerFicha: nil enFila: pos y columna: pos x
+]
+
+{ #category : 'operations' }
+Tablero >> valorMinimo [
+	"Menor valor entre las fichas comunes. Los comodines no cuentan. Devuelve 0 si no hay ninguna."
+
+	| valores |
+	valores := (self fichas reject: [ :f | f esComodin ]) collect: [ :f | f valor ].
+	^ valores isEmpty ifTrue: [ 0 ] ifFalse: [ valores min ]
 ]
 
 { #category : 'queries' }
