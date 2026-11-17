@@ -9,7 +9,8 @@ Class {
 		'puntaje',
 		'mejorPuntaje',
 		'metaValor',
-		'vidas'
+		'vidas',
+		'racha'
 	],
 	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
@@ -75,7 +76,8 @@ Partida >> initializeTablero: unTablero meta: unValor vidas: cantidadDeVidas [
 	metaValor := unValor.
 	vidas := cantidadDeVidas.
 	puntaje := 0.
-	mejorPuntaje := 0
+	mejorPuntaje := 0.
+	racha := Racha new
 ]
 
 { #category : 'accessing' }
@@ -118,12 +120,19 @@ Partida >> puntosPorAbsorber: cantidad [
 	^ cantidad * 10
 ]
 
+{ #category : 'accessing' }
+Partida >> racha [
+
+	^ racha
+]
+
 { #category : 'operations' }
 Partida >> reiniciar [
 
 	mejorPuntaje := mejorPuntaje max: puntaje.
 	puntaje := 0.
 	vidas := self class vidasIniciales.
+	racha reiniciar.
 	tablero reiniciar.
 	self mezclarHastaHaberMovimientos
 ]
@@ -134,6 +143,7 @@ Partida >> seleccionar: pos [
 	| absorbidas |
 	(tablero puedeFusionar: pos) ifFalse: [ ^ false ].
 	absorbidas := tablero fusionar: pos.
+	racha registrar: (tablero fichaEn: pos) valor.
 	puntaje := puntaje + (self puntosPorAbsorber: absorbidas).
 	tablero aplicarGravedad.
 	tablero rellenar.
