@@ -1,5 +1,5 @@
 "
-Aplica las reglas del juego: puntaje, victoria y derrota. Coordina al tablero.
+Aplica las reglas del juego: puntaje, vidas, racha, bonus, victoria y derrota. Coordina al tablero y decide cuando se pierde una vida.
 "
 Class {
 	#name : 'Partida',
@@ -10,7 +10,8 @@ Class {
 		'mejorPuntaje',
 		'metaValor',
 		'vidas',
-		'racha'
+		'racha',
+		'cargasDeBonus'
 	],
 	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
@@ -57,6 +58,12 @@ Partida class >> vidasIniciales [
 	^ 3
 ]
 
+{ #category : 'accessing' }
+Partida >> cargasDeBonus [
+
+	^ cargasDeBonus
+]
+
 { #category : 'testing' }
 Partida >> estaGanada [
 
@@ -77,7 +84,8 @@ Partida >> initializeTablero: unTablero meta: unValor vidas: cantidadDeVidas [
 	vidas := cantidadDeVidas.
 	puntaje := 0.
 	mejorPuntaje := 0.
-	racha := Racha new
+	racha := Racha new.
+	cargasDeBonus := 0
 ]
 
 { #category : 'accessing' }
@@ -98,6 +106,21 @@ Partida >> mezclarHastaHaberMovimientos [
 		intentos > self class maximoMezclas
 			ifTrue: [ tablero reiniciar. intentos := 0 ]
 			ifFalse: [ tablero mezclar ] ]
+]
+
+{ #category : 'operations' }
+Partida >> otorgarBonus [
+
+	cargasDeBonus := cargasDeBonus + 1
+]
+
+{ #category : 'private' }
+Partida >> otorgarBonusSiCorresponde [
+	"Al completar la racha se gana una carga de bonus y la racha vuelve a cero."
+
+	racha umbralAlcanzado ifFalse: [ ^ self ].
+	self otorgarBonus.
+	racha reiniciar
 ]
 
 { #category : 'operations' }
@@ -132,6 +155,7 @@ Partida >> reiniciar [
 	mejorPuntaje := mejorPuntaje max: puntaje.
 	puntaje := 0.
 	vidas := self class vidasIniciales.
+	cargasDeBonus := 0.
 	racha reiniciar.
 	tablero reiniciar.
 	self mezclarHastaHaberMovimientos
@@ -144,6 +168,7 @@ Partida >> seleccionar: pos [
 	(tablero puedeFusionar: pos) ifFalse: [ ^ false ].
 	absorbidas := tablero fusionar: pos.
 	racha registrar: (tablero fichaEn: pos) valor.
+	self otorgarBonusSiCorresponde.
 	puntaje := puntaje + (self puntosPorAbsorber: absorbidas).
 	tablero aplicarGravedad.
 	tablero rellenar.
@@ -156,6 +181,22 @@ Partida >> seleccionar: pos [
 Partida >> tablero [
 
 	^ tablero
+]
+
+{ #category : 'operations' }
+Partida >> usarBonus: unBonus en: posiciones [
+	"Gasta una carga y aplica el efecto. Devuelve false si no se pudo usar.
+	No cuesta vida ni rompe la racha. Si deja el tablero bloqueado, lo mezcla sin costo."
+
+	cargasDeBonus > 0 ifFalse: [ ^ false ].
+	(unBonus puedeAplicarseEn: tablero con: posiciones) ifFalse: [ ^ false ].
+	unBonus aplicarEn: tablero con: posiciones.
+	cargasDeBonus := cargasDeBonus - 1.
+	tablero aplicarGravedad.
+	tablero rellenar.
+	mejorPuntaje := mejorPuntaje max: puntaje.
+	self estaGanada ifFalse: [ self mezclarHastaHaberMovimientos ].
+	^ true
 ]
 
 { #category : 'operations' }
