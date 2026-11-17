@@ -1,3 +1,6 @@
+"
+Elimina una ficha elegida por el jugador.
+"
 Class {
 	#name : 'BonusRomper',
 	#superclass : 'Bonus',

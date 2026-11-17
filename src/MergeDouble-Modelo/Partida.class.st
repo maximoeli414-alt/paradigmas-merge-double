@@ -1,5 +1,5 @@
 "
-Aplica las reglas del juego: puntaje, victoria y derrota. Coordina al tablero.
+Aplica las reglas del juego: puntaje, vidas, racha, bonus, victoria y derrota. Coordina al tablero y decide cuando se pierde una vida.
 "
 Class {
 	#name : 'Partida',

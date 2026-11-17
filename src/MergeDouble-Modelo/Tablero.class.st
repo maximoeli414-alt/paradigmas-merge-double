@@ -1,5 +1,5 @@
 "
-Administra la grilla de fichas: busca grupos, fusiona, aplica gravedad y rellena. Posiciones: columna @ fila (x = columna, y = fila). La fila 1 es la de arriba.
+Administra la grilla de fichas: busca grupos, fusiona, aplica gravedad, rellena y mezcla. Ofrece las operaciones que usan los bonus. Posiciones: columna @ fila (x = columna, y = fila). La fila 1 es la de arriba.
 "
 Class {
 	#name : 'Tablero',

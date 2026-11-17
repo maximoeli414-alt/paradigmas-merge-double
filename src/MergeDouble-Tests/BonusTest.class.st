@@ -16,27 +16,27 @@ BonusTest >> setUp [
 	tablero rellenar
 ]
 
-{ #category : 'running' }
+{ #category : 'tests' }
 BonusTest >> testDuplicarNoAceptaComodin [
 
 	tablero ponerFicha: (FichaComodin valor: 0) enFila: 1 columna: 1.
 	self deny: (BonusDuplicar new puedeAplicarseEn: tablero con: { 1 @ 1 })
 ]
 
-{ #category : 'running' }
+{ #category : 'tests' }
 BonusTest >> testHayCincoBonusDisponibles [
 
 	self assert: Bonus todos size equals: 5
 ]
 
-{ #category : 'running' }
+{ #category : 'tests' }
 BonusTest >> testIntercambiarExigeDosPosicionesDistintas [
 
 	self assert: (BonusIntercambiar new puedeAplicarseEn: tablero con: { 1 @ 1. 2 @ 2 }).
 	self deny: (BonusIntercambiar new puedeAplicarseEn: tablero con: { 1 @ 1. 1 @ 1 })
 ]
 
-{ #category : 'running' }
+{ #category : 'tests' }
 BonusTest >> testRomperExigeUnaPosicionValida [
 
 	self assert: (BonusRomper new puedeAplicarseEn: tablero con: { 1 @ 1 }).

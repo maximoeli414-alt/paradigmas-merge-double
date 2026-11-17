@@ -1,3 +1,6 @@
+"
+Elimina del tablero todas las fichas comunes de menor valor, para despejar espacio.
+"
 Class {
 	#name : 'BonusEliminarMenor',
 	#superclass : 'Bonus',

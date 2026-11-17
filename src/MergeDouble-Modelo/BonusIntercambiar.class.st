@@ -1,3 +1,6 @@
+"
+Intercambia de lugar dos fichas elegidas por el jugador.
+"
 Class {
 	#name : 'BonusIntercambiar',
 	#superclass : 'Bonus',

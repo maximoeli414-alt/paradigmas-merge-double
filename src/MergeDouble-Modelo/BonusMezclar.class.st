@@ -1,3 +1,6 @@
+"
+Redistribuye al azar todas las fichas del tablero.
+"
 Class {
 	#name : 'BonusMezclar',
 	#superclass : 'Bonus',

@@ -1,3 +1,6 @@
+"
+Duplica el valor de una ficha comun elegida por el jugador.
+"
 Class {
 	#name : 'BonusDuplicar',
 	#superclass : 'Bonus',
