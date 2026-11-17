@@ -36,6 +36,25 @@ PartidaTest >> testBloqueoRestaUnaVida [
 ]
 
 { #category : 'tests' }
+PartidaTest >> testBonusConPosicionInvalidaNoGastaLaCarga [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	partida otorgarBonus.
+	self deny: (partida usarBonus: BonusRomper new en: { 9 @ 9 }).
+	self assert: partida cargasDeBonus equals: 1
+]
+
+{ #category : 'tests' }
+PartidaTest >> testCompletarLaRachaOtorgaUnBonus [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	#(1 2 4) do: [ :v | partida racha registrar: v ].
+	partida seleccionar: 1 @ 1.
+	self assert: partida cargasDeBonus equals: 1.
+	self assert: partida racha contador equals: 0
+]
+
+{ #category : 'tests' }
 PartidaTest >> testConMovimientosNoSeRestaVida [
 
 	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
@@ -94,9 +113,25 @@ PartidaTest >> testSeleccionInvalidaNoTocaLaRacha [
 ]
 
 { #category : 'tests' }
+PartidaTest >> testSinCargasNoSePuedeUsarUnBonus [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	self deny: (partida usarBonus: BonusMezclar new en: #())
+]
+
+{ #category : 'tests' }
 PartidaTest >> testTrasPerderUnaVidaElTableroTieneMovimientos [
 
 	partida := self partidaConMatriz: { {4. 2. 8}. {2. 16. 4}. {8. 4. 2} } meta: 2048 vidas: 3.
 	partida verificarBloqueo.
 	self assert: partida tablero hayMovimientosPosibles
+]
+
+{ #category : 'tests' }
+PartidaTest >> testUsarUnBonusGastaUnaCarga [
+
+	partida := self partidaConMatriz: { {4. 4. 4}. {2. 8. 16}. {16. 2. 8} } meta: 2048 vidas: 3.
+	partida otorgarBonus.
+	self assert: (partida usarBonus: BonusMezclar new en: #()).
+	self assert: partida cargasDeBonus equals: 0
 ]
