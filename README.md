@@ -25,3 +25,9 @@ Abrir el Test Runner y ejecutar los paquetes `MergeDouble-Tests`.
 ## Convenciones
 - Posiciones: `columna @ fila` (x = columna, y = fila). La fila 1 es la de arriba.
 - Adyacencia en 4 direcciones (sin diagonales). Grupo valido: minimo 3 fichas.
+
+## Variaciones propias
+- Vidas: 3. Si el tablero queda sin movimientos se pierde una vida y se mezcla. Con 0 vidas termina la partida.
+- Racha: 4 fusiones consecutivas de valor creciente desbloquean una carga de bonus.
+- Bonus (tecla B en la consola): romper una ficha, intercambiar dos, mezclar el tablero, duplicar una ficha y eliminar las fichas de menor valor.
+- Bloques con bonus: algunas fichas aparecen marcadas con + y otorgan una carga de bonus al fusionarse.

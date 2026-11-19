@@ -5,8 +5,10 @@ Class {
 	#name : 'Ficha',
 	#superclass : 'Object',
 	#instVars : [
-		'valor'
+		'valor',
+		'conBonus'
 	],
+	#category : 'MergeDouble-Modelo',
 	#package : 'MergeDouble-Modelo'
 }
 
@@ -16,16 +18,10 @@ Ficha class >> valor: unValor [
 	^ self new setValor: unValor
 ]
 
-{ #category : 'initialization' }
-Ficha >> setValor: unValor [
+{ #category : 'operations' }
+Ficha >> duplicar [
 
-	valor := unValor
-]
-
-{ #category : 'accessing' }
-Ficha >> valor [
-
-	^ valor
+	valor := valor * 2
 ]
 
 { #category : 'testing' }
@@ -40,14 +36,46 @@ Ficha >> esCompatibleCon: otraFicha [
 	^ self subclassResponsibility
 ]
 
-{ #category : 'operations' }
-Ficha >> duplicar [
+{ #category : 'initialization' }
+Ficha >> initialize [
 
-	valor := valor * 2
+	super initialize.
+	conBonus := false
+]
+
+{ #category : 'operations' }
+Ficha >> marcarConBonus [
+
+	conBonus := true
 ]
 
 { #category : 'printing' }
 Ficha >> printOn: aStream [
 
-	aStream print: valor
+	aStream print: valor.
+	self tieneBonus ifTrue: [ aStream nextPut: $+ ]
+]
+
+{ #category : 'operations' }
+Ficha >> quitarBonus [
+
+	conBonus := false
+]
+
+{ #category : 'initialization' }
+Ficha >> setValor: unValor [
+
+	valor := unValor
+]
+
+{ #category : 'testing' }
+Ficha >> tieneBonus [
+
+	^ conBonus
+]
+
+{ #category : 'accessing' }
+Ficha >> valor [
+
+	^ valor
 ]
