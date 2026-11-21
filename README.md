@@ -16,6 +16,9 @@ Implementacion en Smalltalk (Pharo 13) del escenario 10: Merge & Double.
 Abrir el Transcript (Tools > Transcript) y ejecutar en el Playground:
 
     (VistaConsola partida: Partida estandar) jugar
+o 
+    VistaGrafica abrir
+    
 
 Ingresar fila y columna separadas por un espacio (ej: `3 4`).
 
